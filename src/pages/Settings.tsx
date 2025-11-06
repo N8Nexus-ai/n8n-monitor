@@ -23,9 +23,6 @@ export default function Settings() {
       setApiUrl(config.url);
       setSavedApiKey(config.apiKey);
       setApiKey(config.apiKey);
-    } else {
-      // Set defaults if no config exists
-      setApiUrl('https://n8n.example.com');
     }
   }, []);
 
@@ -51,11 +48,21 @@ export default function Settings() {
 
     // Validate URL format
     try {
-      new URL(apiUrl.trim());
+      const url = new URL(apiUrl.trim());
+      
+      // Check if URL contains UI paths that should be removed
+      if (url.pathname.includes('/home/') || url.pathname.includes('/workflows') || url.pathname.includes('/api/')) {
+        toast({
+          title: 'URL Format Warning',
+          description: 'Please use only the base URL (e.g., https://workflow.space.usedotted.com). Remove paths like /home/workflows or /api/v1.',
+          variant: 'destructive',
+        });
+        return;
+      }
     } catch {
       toast({
         title: 'Validation Error',
-        description: 'Please enter a valid URL (e.g., https://n8n.example.com)',
+        description: 'Please enter a valid URL (e.g., https://workflow.space.usedotted.com)',
         variant: 'destructive',
       });
       return;
@@ -132,8 +139,11 @@ export default function Settings() {
               id="apiUrl"
               value={apiUrl}
               onChange={(e) => setApiUrl(e.target.value)}
-              placeholder="https://n8n.example.com"
+              placeholder="https://workflow.space.usedotted.com"
             />
+            <p className="text-xs text-muted-foreground">
+              Enter only the base URL. Do not include paths like /home/workflows or /api/v1
+            </p>
           </div>
 
           <div className="space-y-2">
