@@ -3,11 +3,10 @@ import { MetricCard } from '@/components/dashboard/MetricCard';
 import { ExecutionChart } from '@/components/dashboard/ExecutionChart';
 import { WorkflowList } from '@/components/dashboard/WorkflowList';
 import { ExecutionsList } from '@/components/dashboard/ExecutionsList';
-import { Activity, CheckCircle2, XCircle, Clock, Zap, AlertCircle } from 'lucide-react';
+import { Activity, CheckCircle2, XCircle, Clock, Zap } from 'lucide-react';
 import { fetchExecutions, fetchWorkflows, fetchAllExecutions } from '@/lib/n8nApi';
 import { Execution, Workflow, MetricsSummary } from '@/types/n8n';
 import { Card } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 /**
  * Calculate metrics from execution data
@@ -106,13 +105,11 @@ export default function Dashboard() {
   const [executions, setExecutions] = useState<Execution[]>([]);
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
   const loadData = async () => {
     try {
       setLoading(true);
-      setError(null);
 
       // Fetch workflows and executions in parallel
       const [workflowsData, executionsData] = await Promise.all([
@@ -124,9 +121,11 @@ export default function Dashboard() {
       setExecutions(executionsData);
       setLastUpdate(new Date());
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load data from n8n API';
-      setError(errorMessage);
+      // Silently fail and show empty dashboard
       console.error('Error loading dashboard data:', err);
+      // Keep empty arrays - dashboard will show zero values
+      setWorkflows([]);
+      setExecutions([]);
     } finally {
       setLoading(false);
     }
@@ -147,7 +146,7 @@ export default function Dashboard() {
     .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime())
     .slice(0, 10);
 
-  if (loading && executions.length === 0) {
+  if (loading && executions.length === 0 && workflows.length === 0) {
     return (
       <div className="space-y-8 animate-fade-in">
         <div className="flex items-center justify-center min-h-[400px]">
@@ -156,26 +155,6 @@ export default function Dashboard() {
             <p className="text-muted-foreground">Loading dashboard data...</p>
           </div>
         </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="space-y-8 animate-fade-in">
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error Loading Data</AlertTitle>
-          <AlertDescription>
-            {error}
-            <button
-              onClick={loadData}
-              className="ml-2 underline hover:no-underline"
-            >
-              Try again
-            </button>
-          </AlertDescription>
-        </Alert>
       </div>
     );
   }
