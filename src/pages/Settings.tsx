@@ -3,12 +3,106 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Key, Database, Bell, Shield } from 'lucide-react';
-import { useState } from 'react';
+import { Key, Database, Bell, Shield, Eye, EyeOff } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { saveApiConfig, loadApiConfig, getMaskedApiKey } from '@/lib/apiConfig';
 
 export default function Settings() {
-  const [apiKey, setApiKey] = useState('n8n_api_**********************');
-  const [apiUrl, setApiUrl] = useState('https://n8n.example.com');
+  const { toast } = useToast();
+  const [apiKey, setApiKey] = useState('');
+  const [apiUrl, setApiUrl] = useState('');
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [savedApiKey, setSavedApiKey] = useState<string | null>(null);
+
+  // Load configuration from localStorage on mount
+  useEffect(() => {
+    const config = loadApiConfig();
+    if (config) {
+      setApiUrl(config.url);
+      setSavedApiKey(config.apiKey);
+      setApiKey(config.apiKey);
+    } else {
+      // Set defaults if no config exists
+      setApiUrl('https://n8n.example.com');
+    }
+  }, []);
+
+  const handleSave = () => {
+    // Validate inputs
+    if (!apiUrl.trim()) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please enter a valid n8n instance URL',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!apiKey.trim()) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please enter an API key',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Validate URL format
+    try {
+      new URL(apiUrl.trim());
+    } catch {
+      toast({
+        title: 'Validation Error',
+        description: 'Please enter a valid URL (e.g., https://n8n.example.com)',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      saveApiConfig({
+        url: apiUrl.trim(),
+        apiKey: apiKey.trim(),
+      });
+      setSavedApiKey(apiKey.trim());
+      setIsEditing(false);
+      setShowApiKey(false);
+      toast({
+        title: 'Configuration Saved',
+        description: 'Your API configuration has been saved to local cache.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to save configuration. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleApiKeyFocus = () => {
+    setIsEditing(true);
+  };
+
+  const handleApiKeyBlur = () => {
+    // If the value hasn't changed, stop editing
+    if (savedApiKey && apiKey === savedApiKey && !showApiKey) {
+      setIsEditing(false);
+    }
+  };
+
+  const handleToggleVisibility = () => {
+    setShowApiKey(!showApiKey);
+  };
+
+  // Determine what to display: show masked if saved, not editing, and not showing
+  const shouldMask = savedApiKey && !isEditing && !showApiKey && apiKey === savedApiKey;
+  const displayApiKey = shouldMask ? getMaskedApiKey(apiKey) : apiKey;
+  // Use text type when showing masked value (to display custom mask), when showing, or when editing
+  // Use password type only when hiding actual value during editing
+  const inputType = shouldMask || showApiKey || isEditing ? 'text' : 'password';
 
   return (
     <div className="space-y-6">
@@ -44,19 +138,45 @@ export default function Settings() {
 
           <div className="space-y-2">
             <Label htmlFor="apiKey">API Key</Label>
-            <Input
-              id="apiKey"
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="Enter your n8n API key"
-            />
+            <div className="relative">
+              <Input
+                id="apiKey"
+                type={inputType}
+                value={displayApiKey}
+                onChange={(e) => {
+                  setApiKey(e.target.value);
+                  setIsEditing(true);
+                }}
+                onFocus={handleApiKeyFocus}
+                onBlur={handleApiKeyBlur}
+                placeholder="Enter your n8n API key"
+                className="pr-10"
+              />
+              {savedApiKey && (
+                <button
+                  type="button"
+                  onClick={handleToggleVisibility}
+                  onMouseDown={(e) => e.preventDefault()} // Prevent input blur
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label={showApiKey ? 'Hide API key' : 'Show API key'}
+                >
+                  {showApiKey ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              )}
+            </div>
             <p className="text-xs text-muted-foreground">
               Find your API key in n8n Settings → API
             </p>
           </div>
 
-          <Button className="w-full sm:w-auto">
+          <Button 
+            className="w-full sm:w-auto" 
+            onClick={handleSave}
+          >
             Save Configuration
           </Button>
         </div>
