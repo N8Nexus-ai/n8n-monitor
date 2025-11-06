@@ -1,6 +1,7 @@
 import { NavLink } from '@/components/NavLink';
 import { LayoutDashboard, Workflow, History, Shield, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -47,7 +48,7 @@ export function Sidebar() {
           ))}
         </nav>
 
-        <div className="border-t border-sidebar-border/50 p-4">
+        <div className="border-t border-sidebar-border/50 p-4 space-y-3">
           <div className="rounded-xl bg-gradient-to-br from-sidebar-accent/50 to-sidebar-accent/30 p-4 backdrop-blur-sm border border-sidebar-border/30">
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 rounded-full bg-success animate-pulse"></div>
@@ -58,6 +59,10 @@ export function Sidebar() {
             <p className="mt-1 text-xs text-muted-foreground ml-4">
               API Key configured
             </p>
+          </div>
+          
+          <div className="flex items-center justify-center">
+            <ThemeToggle />
           </div>
         </div>
       </div>
