@@ -1,73 +1,182 @@
-# Welcome to your Lovable project
+# n8n Monitor - Observer Dashboard
 
-## Project info
+A modern, real-time observability dashboard for monitoring and managing your n8n workflows. Built with a beautiful, responsive UI that provides comprehensive insights into your workflow executions, performance metrics, and system status.
 
-**URL**: https://lovable.dev/projects/218c5efa-b5a0-437a-9c06-273052ff2f2c
+## ✨ Features
 
-## How can I edit this code?
+- 📊 **Real-time Dashboard** - Monitor key metrics and execution trends at a glance
+- 📈 **Interactive Charts** - Visualize execution data with beautiful area charts
+- 🔍 **Workflow Management** - Search, filter, and manage all your workflows
+- 📝 **Execution History** - Track all workflow executions with detailed status information
+- 🎨 **Modern UI** - Beautiful design with smooth animations and transitions
+- 🌙 **Dark Theme** - Optimized dark theme for comfortable viewing
+- ⚡ **Fast & Responsive** - Built with modern React and optimized for performance
 
-There are several ways of editing your application.
+## 🚀 Tech Stack
 
-**Use Lovable**
+- **Framework**: React 18 + TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui + Radix UI
+- **Charts**: Recharts
+- **Routing**: React Router
+- **State Management**: TanStack Query
+- **Icons**: Lucide React
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/218c5efa-b5a0-437a-9c06-273052ff2f2c) and start prompting.
+## 📦 Installation
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Node.js 18+ (recommended: use [nvm](https://github.com/nvm-sh/nvm))
+- npm, yarn, or bun
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Setup
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+```bash
+# Clone the repository
+git clone <repository-url>
+cd n8n-monitor
 
-Follow these steps:
+# Install dependencies
+npm install
+# or
+yarn install
+# or
+bun install
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
+# or
+yarn dev
+# or
+bun dev
 ```
 
-**Edit a file directly in GitHub**
+The application will be available at `http://localhost:5173`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🛠️ Available Scripts
 
-**Use GitHub Codespaces**
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run build:dev` - Build for development
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 📁 Project Structure
 
-## What technologies are used for this project?
+```
+n8n-monitor/
+├── src/
+│   ├── components/
+│   │   ├── dashboard/      # Dashboard-specific components
+│   │   ├── layout/         # Layout components (Sidebar, etc.)
+│   │   └── ui/             # Reusable UI components
+│   ├── hooks/              # Custom React hooks
+│   ├── lib/                # Utilities and mock data
+│   ├── pages/              # Page components
+│   ├── types/              # TypeScript type definitions
+│   ├── App.tsx             # Main app component
+│   └── main.tsx            # Entry point
+├── public/                 # Static assets
+└── tailwind.config.ts      # Tailwind configuration
+```
 
-This project is built with:
+## 🎨 Design Features
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Modern UI Elements
+- **Gradient Cards** - Beautiful gradient backgrounds for metric cards
+- **Smooth Animations** - Fade-in, slide-up, and scale animations
+- **Glass Morphism** - Backdrop blur effects for modern aesthetics
+- **Interactive Hover States** - Enhanced user experience with hover effects
+- **Responsive Grid Layouts** - Adaptive layouts for all screen sizes
 
-## How can I deploy this project?
+### Visual Enhancements
+- Custom scrollbars
+- Animated status indicators
+- Gradient badges and icons
+- Smooth transitions and micro-interactions
+- Professional color scheme with proper contrast
 
-Simply open [Lovable](https://lovable.dev/projects/218c5efa-b5a0-437a-9c06-273052ff2f2c) and click on Share -> Publish.
+## 📊 Dashboard Pages
 
-## Can I connect a custom domain to my Lovable project?
+### Dashboard
+- Real-time metrics overview
+- Execution trends chart (24h)
+- Active workflows list
+- Recent executions feed
 
-Yes, you can!
+### Workflows
+- Grid view of all workflows
+- Search and filter functionality
+- Status indicators
+- Workflow tags and metadata
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### Executions
+- Detailed execution history
+- Status-based filtering
+- Duration and timing information
+- Workflow association
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### Audit & Settings
+- System audit logs
+- Configuration management
+
+## 🔌 API Integration
+
+This project is designed to integrate with the n8n API. Currently using mock data for development. To connect to a real n8n instance:
+
+1. Configure your n8n API endpoint
+2. Add API key authentication
+3. Update the API client in `src/lib/api/`
+
+## 🎯 Key Improvements
+
+### Design Enhancements
+- ✅ Modern gradient-based design system
+- ✅ Improved typography and spacing
+- ✅ Enhanced card components with backdrop blur
+- ✅ Smooth animations and transitions
+- ✅ Better visual hierarchy
+- ✅ Responsive and accessible UI
+
+### User Experience
+- ✅ Intuitive navigation
+- ✅ Clear status indicators
+- ✅ Real-time updates
+- ✅ Fast search and filtering
+- ✅ Consistent design language
+
+## 🚢 Deployment
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+The build output will be in the `dist/` directory, ready to be deployed to any static hosting service.
+
+### Recommended Hosting
+
+- **Vercel** - Zero-config deployment
+- **Netlify** - Static site hosting
+- **Cloudflare Pages** - Fast global CDN
+- **AWS S3 + CloudFront** - Enterprise hosting
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is private and proprietary.
+
+## 🙏 Acknowledgments
+
+- Built with [shadcn/ui](https://ui.shadcn.com/)
+- Icons by [Lucide](https://lucide.dev/)
+- Charts by [Recharts](https://recharts.org/)
+
+---
+
+Made with ❤️ for n8n workflow monitoring
