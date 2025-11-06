@@ -3,10 +3,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Key, Database, Bell, Shield, Eye, EyeOff } from 'lucide-react';
+import { Key, Database, Bell, Shield, Eye, EyeOff, CheckCircle2, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { saveApiConfig, loadApiConfig, getMaskedApiKey } from '@/lib/apiConfig';
+import { fetchWorkflows, fetchExecutions } from '@/lib/n8nApi';
 
 export default function Settings() {
   const { toast } = useToast();
@@ -15,6 +16,7 @@ export default function Settings() {
   const [showApiKey, setShowApiKey] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [savedApiKey, setSavedApiKey] = useState<string | null>(null);
+  const [isTestingConnection, setIsTestingConnection] = useState(false);
 
   // Load configuration from localStorage on mount
   useEffect(() => {
@@ -104,6 +106,98 @@ export default function Settings() {
     setShowApiKey(!showApiKey);
   };
 
+  const handleTestConnection = async () => {
+    // Validate inputs first
+    if (!apiUrl.trim()) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please enter a valid n8n instance URL',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!apiKey.trim()) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please enter an API key',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Validate URL format
+    try {
+      const url = new URL(apiUrl.trim());
+      
+      // Check if URL contains UI paths that should be removed
+      if (url.pathname.includes('/home/') || url.pathname.includes('/workflows') || url.pathname.includes('/api/')) {
+        toast({
+          title: 'URL Format Warning',
+          description: 'Please use only the base URL (e.g., https://workflow.space.usedotted.com). Remove paths like /home/workflows or /api/v1.',
+          variant: 'destructive',
+        });
+        return;
+      }
+    } catch {
+      toast({
+        title: 'Validation Error',
+        description: 'Please enter a valid URL (e.g., https://workflow.space.usedotted.com)',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsTestingConnection(true);
+
+    try {
+      // Temporarily save config to test
+      const tempConfig = {
+        url: apiUrl.trim(),
+        apiKey: apiKey.trim(),
+      };
+      
+      // Save temporarily to localStorage for the API functions to use
+      saveApiConfig(tempConfig);
+
+      // Test by fetching workflows and executions
+      const [workflowsResult, executionsResult] = await Promise.all([
+        fetchWorkflows({ limit: 1 }),
+        fetchExecutions({ limit: 1 }),
+      ]);
+
+      // Restore original config if it was different
+      const originalConfig = loadApiConfig();
+      if (originalConfig && (originalConfig.url !== tempConfig.url || originalConfig.apiKey !== tempConfig.apiKey)) {
+        // User was testing with different values, restore original
+        saveApiConfig(originalConfig);
+      }
+
+      const workflowsCount = workflowsResult.data.length;
+      const hasExecutions = executionsResult.data.length > 0;
+
+      toast({
+        title: 'Connection Successful! ✅',
+        description: `Successfully connected to n8n API. Found ${workflowsCount} workflow(s) and ${hasExecutions ? 'executions available' : 'no executions yet'}.`,
+      });
+    } catch (error) {
+      // Restore original config on error
+      const originalConfig = loadApiConfig();
+      if (originalConfig && (originalConfig.url !== apiUrl.trim() || originalConfig.apiKey !== apiKey.trim())) {
+        saveApiConfig(originalConfig);
+      }
+
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      toast({
+        title: 'Connection Failed ❌',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsTestingConnection(false);
+    }
+  };
+
   // Determine what to display: show masked if saved, not editing, and not showing
   const shouldMask = savedApiKey && !isEditing && !showApiKey && apiKey === savedApiKey;
   const displayApiKey = shouldMask ? getMaskedApiKey(apiKey) : apiKey;
@@ -183,12 +277,32 @@ export default function Settings() {
             </p>
           </div>
 
-          <Button 
-            className="w-full sm:w-auto" 
-            onClick={handleSave}
-          >
-            Save Configuration
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button 
+              className="w-full sm:w-auto" 
+              onClick={handleSave}
+            >
+              Save Configuration
+            </Button>
+            <Button 
+              variant="outline"
+              className="w-full sm:w-auto" 
+              onClick={handleTestConnection}
+              disabled={isTestingConnection || !apiUrl.trim() || !apiKey.trim()}
+            >
+              {isTestingConnection ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Testing...
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="mr-2 h-4 w-4" />
+                  Test Connection
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </Card>
 
