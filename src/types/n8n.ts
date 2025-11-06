@@ -1,5 +1,5 @@
 export type ExecutionStatus = 'error' | 'success' | 'waiting' | 'running' | 'canceled';
-export type ExecutionMode = 'manual' | 'trigger' | 'webhook' | 'retry';
+export type ExecutionMode = 'manual' | 'trigger' | 'webhook' | 'retry' | 'cli';
 
 export interface Execution {
   id: string;
