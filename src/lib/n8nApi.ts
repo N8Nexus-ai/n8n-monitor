@@ -76,35 +76,68 @@ async function apiRequest<T>(
   
   const url = `${apiUrl}${endpoint}`;
   
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      'X-N8N-API-KEY': apiKey,
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
+  try {
+    const response = await fetch(url, {
+      ...options,
+      method: options.method || 'GET',
+      headers: {
+        'accept': 'application/json',
+        'X-N8N-API-KEY': apiKey,
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      // Add mode and credentials for CORS handling
+      mode: 'cors',
+      credentials: 'omit',
+    });
 
-  if (!response.ok) {
-    if (response.status === 401) {
-      throw new Error('Unauthorized. Please check your API key.');
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('Unauthorized. Please check your API key.');
+      }
+      if (response.status === 404) {
+        throw new Error('Resource not found. Please verify your n8n instance URL.');
+      }
+      if (response.status === 503) {
+        throw new Error(`Service unavailable (503). This usually means:
+- The n8n instance is down or unreachable
+- There's a network/proxy issue
+- CORS is blocking the request
+- A browser extension is interfering
+
+Try:
+1. Check if the URL is accessible: ${url}
+2. Verify CORS settings on your n8n instance
+3. Disable browser extensions and try again
+4. Check browser console for CORS errors`);
+      }
+      const errorText = await response.text();
+      throw new Error(`API request failed: ${response.status} ${response.statusText}. URL: ${url}. ${errorText}`);
     }
-    if (response.status === 404) {
-      throw new Error('Resource not found. Please verify your n8n instance URL.');
+
+    // Handle 204 No Content responses
+    if (response.status === 204) {
+      return {} as T;
     }
-    if (response.status === 503) {
-      throw new Error(`Service unavailable. Please check if your n8n instance is running and the URL is correct: ${url}`);
+
+    return response.json();
+  } catch (error) {
+    // Handle network errors, CORS errors, etc.
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new Error(`Network error: Unable to reach ${url}. This could be:
+- CORS policy blocking the request
+- Network connectivity issue
+- Invalid URL format
+- Server is not responding
+
+Check:
+1. The URL is correct: ${url}
+2. CORS is enabled on your n8n instance
+3. Your network connection`);
     }
-    const errorText = await response.text();
-    throw new Error(`API request failed: ${response.status} ${response.statusText}. URL: ${url}. ${errorText}`);
+    // Re-throw other errors
+    throw error;
   }
-
-  // Handle 204 No Content responses
-  if (response.status === 204) {
-    return {} as T;
-  }
-
-  return response.json();
 }
 
 /**
@@ -178,6 +211,9 @@ export async function fetchWorkflows(params?: {
   if (params?.cursor) {
     queryParams.append('cursor', params.cursor);
   }
+  if (params?.active !== undefined) {
+    queryParams.append('active', params.active.toString());
+  }
   if (params?.projectId) {
     queryParams.append('projectId', params.projectId);
   }
@@ -195,13 +231,8 @@ export async function fetchWorkflows(params?: {
     updatedAt: workflow.updatedAt,
   }));
 
-  // Filter by active if specified
-  const filteredData = params?.active !== undefined
-    ? transformedData.filter(w => w.active === params.active)
-    : transformedData;
-
   return {
-    data: filteredData,
+    data: transformedData,
     nextCursor: response.nextCursor,
   };
 }
