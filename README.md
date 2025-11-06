@@ -1,6 +1,7 @@
 # n8n Monitor - Observer Dashboard
 
 A modern, real-time observability dashboard for monitoring and managing your n8n workflows. Built with a beautiful, responsive UI that provides comprehensive insights into your workflow executions, performance metrics, and system status.
+![957093b2-684b-4422-b721-6a7aaa51ae9e](https://github.com/user-attachments/assets/71383073-f897-4d64-b981-4000f5fc9de2)
 
 ## ✨ Features
 
