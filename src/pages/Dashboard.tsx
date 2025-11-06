@@ -7,12 +7,20 @@ import { mockMetrics, mockWorkflows, mockExecutions, mockChartData } from '@/lib
 
 export default function Dashboard() {
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-        <p className="mt-1 text-muted-foreground">
-          Real-time observability for your n8n workflows
-        </p>
+    <div className="space-y-8 animate-fade-in">
+      <div className="animate-slide-up">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold text-foreground tracking-tight">Dashboard</h1>
+            <p className="mt-2 text-muted-foreground">
+              Real-time observability for your n8n workflows
+            </p>
+          </div>
+          <div className="flex items-center gap-2 rounded-lg bg-card/50 px-4 py-2 border border-border/50">
+            <div className="h-2 w-2 rounded-full bg-success animate-pulse"></div>
+            <span className="text-sm text-muted-foreground">Live</span>
+          </div>
+        </div>
       </div>
 
       {/* Metrics Grid */}
@@ -57,12 +65,18 @@ export default function Dashboard() {
       </div>
 
       {/* Chart */}
-      <ExecutionChart data={mockChartData} />
+      <div className="animate-slide-up" style={{ animationDelay: '100ms' }}>
+        <ExecutionChart data={mockChartData} />
+      </div>
 
       {/* Lists Grid */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <WorkflowList workflows={mockWorkflows.filter(w => w.active)} />
-        <ExecutionsList executions={mockExecutions} workflows={mockWorkflows} />
+        <div className="animate-slide-up" style={{ animationDelay: '200ms' }}>
+          <WorkflowList workflows={mockWorkflows.filter(w => w.active)} />
+        </div>
+        <div className="animate-slide-up" style={{ animationDelay: '300ms' }}>
+          <ExecutionsList executions={mockExecutions} workflows={mockWorkflows} />
+        </div>
       </div>
     </div>
   );

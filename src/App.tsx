@@ -19,9 +19,9 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <div className="flex min-h-screen bg-background">
+        <div className="flex min-h-screen bg-gradient-to-br from-background via-background to-background/95">
           <Sidebar />
-          <main className="ml-64 flex-1 p-8">
+          <main className="ml-64 flex-1 p-8 animate-fade-in">
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/workflows" element={<Workflows />} />

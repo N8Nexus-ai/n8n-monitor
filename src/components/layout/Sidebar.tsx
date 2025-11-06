@@ -12,37 +12,50 @@ const navigation = [
 
 export function Sidebar() {
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 border-r border-sidebar-border bg-sidebar">
+    <aside className="fixed left-0 top-0 h-screen w-64 border-r border-sidebar-border/50 bg-sidebar/95 backdrop-blur-xl">
       <div className="flex h-full flex-col">
-        <div className="flex h-16 items-center border-b border-sidebar-border px-6">
-          <h1 className="text-xl font-bold text-sidebar-foreground">
-            n8n <span className="text-primary">Observer</span>
-          </h1>
+        <div className="flex h-20 items-center border-b border-sidebar-border/50 px-6">
+          <div className="flex items-center gap-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary shadow-glow">
+              <span className="text-lg font-bold text-primary-foreground">n8</span>
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-sidebar-foreground">
+                n8n <span className="gradient-text">Observer</span>
+              </h1>
+              <p className="text-xs text-muted-foreground">Monitor</p>
+            </div>
+          </div>
         </div>
         
-        <nav className="flex-1 space-y-1 p-4">
-          {navigation.map((item) => (
+        <nav className="flex-1 space-y-2 p-4">
+          {navigation.map((item, index) => (
             <NavLink
               key={item.name}
               to={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-smooth",
-                "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                "group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300",
+                "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground hover:shadow-md",
+                "hover:translate-x-1"
               )}
-              activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
+              activeClassName="bg-gradient-primary text-primary-foreground shadow-glow translate-x-1"
+              style={{ animationDelay: `${index * 50}ms` }}
             >
-              <item.icon className="h-5 w-5" />
+              <item.icon className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" />
               {item.name}
             </NavLink>
           ))}
         </nav>
 
-        <div className="border-t border-sidebar-border p-4">
-          <div className="rounded-lg bg-sidebar-accent p-3">
-            <p className="text-xs font-medium text-sidebar-accent-foreground">
-              Connected to n8n
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
+        <div className="border-t border-sidebar-border/50 p-4">
+          <div className="rounded-xl bg-gradient-to-br from-sidebar-accent/50 to-sidebar-accent/30 p-4 backdrop-blur-sm border border-sidebar-border/30">
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-success animate-pulse"></div>
+              <p className="text-xs font-semibold text-sidebar-accent-foreground">
+                Connected to n8n
+              </p>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground ml-4">
               API Key configured
             </p>
           </div>

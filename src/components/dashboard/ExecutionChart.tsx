@@ -14,11 +14,11 @@ export function ExecutionChart({ data }: ExecutionChartProps) {
   return (
     <Card className="p-6">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-foreground">Executions (Last 24h)</h3>
-        <p className="text-sm text-muted-foreground">Workflow execution trends by status</p>
+        <h3 className="text-xl font-bold text-foreground tracking-tight">Executions (Last 24h)</h3>
+        <p className="mt-1 text-sm text-muted-foreground">Workflow execution trends by status</p>
       </div>
       
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height={350}>
         <AreaChart data={data}>
           <defs>
             <linearGradient id="colorSuccess" x1="0" y1="0" x2="0" y2="1">

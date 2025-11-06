@@ -82,7 +82,10 @@ export default {
         'sm': 'var(--shadow-sm)',
         'md': 'var(--shadow-md)',
         'lg': 'var(--shadow-lg)',
+        'xl': 'var(--shadow-xl)',
         'glow': 'var(--shadow-glow)',
+        'glow-success': 'var(--shadow-glow-success)',
+        'glow-danger': 'var(--shadow-glow-danger)',
       },
       transitionProperty: {
         'smooth': 'var(--transition-smooth)',
